@@ -62,9 +62,9 @@ def date_gen(start_date, end_date, n=7):
 def main():
     MAX_THREADS = 15
     SLEEP = 1
-    FILE_NAME = "top_hits.pik"
-    START_DATE = date(2012, 12, 01)
-    END_DATE = date(2017, 01, 01)
+    FILE_NAME = "top_hits_2000s.pik"
+    START_DATE = date(2000, 01, 01)
+    END_DATE = date(2011, 01, 01)
     CHECKPOINT_INTERVAL = 10
 
     songs = {}
