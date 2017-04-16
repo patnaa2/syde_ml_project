@@ -1,15 +1,18 @@
 from bs4 import BeautifulSoup
 from datetime import timedelta, date
 from random import uniform
-from threading import Thread
+from threading import Thread, Lock
 import urllib2
 import cPickle as pickle
 import time
+
+PRINT_LOCK = Lock()
 
 class ChartScraper(Thread):
     HEADER_URL = "http://www.billboard.com/charts/hot-100/"
 
     def __init__(self, date):
+        self.date = date
         self.url = self.HEADER_URL + date.strftime("%Y-%m-%d")
         self.songs = {}
         self.failed = False
@@ -17,6 +20,8 @@ class ChartScraper(Thread):
         super(ChartScraper, self).__init__()
 
     def run(self):
+        with PRINT_LOCK:
+            print "Processing data for %s" %(self.date)
         try:
             page = urllib2.urlopen(self.url)
         except Exception as e:
@@ -37,6 +42,14 @@ def date_gen(start_date, end_date, n=7):
     assert type(start_date) == date
     assert type(end_date) == date
 
+    if start_date.weekday() != 5:
+        print "Specified start date %s is not a Saturday" %(start_date)
+        print "Updating start date to next Saturday"
+        if start_date.weekday() == 6:
+            start_date = timedelta(6)
+        else:
+            start_date = timedelta(5 - start_date.weekday())
+
     if start_date > end_date:
         raise StopIteration
 
@@ -47,16 +60,18 @@ def date_gen(start_date, end_date, n=7):
             raise StopIteration
 
 def main():
-    MAX_THREADS = 5
-    FILE_NAME = "top_hits.p"
-    START_DATE = date(1997, 02, 01)
-    END_DATE = date(1997, 02, 16)
+    MAX_THREADS = 15
+    SLEEP = 1
+    FILE_NAME = "top_hits.pik"
+    START_DATE = date(2012, 12, 01)
+    END_DATE = date(2017, 01, 01)
+    CHECKPOINT_INTERVAL = 10
 
     songs = {}
     scraper_threads = []
     date_iter = date_gen(START_DATE, END_DATE)
     jitter_power = 1
-    batch = 1
+    batch = 0
     total_batches = (END_DATE - START_DATE).days / 7 / MAX_THREADS
     stop_iter = False
 
@@ -82,15 +97,23 @@ def main():
 
         scraper_threads = []
 
-        print "Scraped one batch..sleeping and continuing"
-
         if stop_iter:
             break
 
-        # sleep w jitter
-        time.sleep(1 +  (uniform(-1, 1) * jitter_power))
+        # checkpoint the dictionary so we don't have to keep redoing this
+        # suspcious we are being rate limited here
+        if not (batch % CHECKPOINT_INTERVAL):
+            print "Checkpointing...\n"
+            CHECKPOINT_FILE = "%s_%s" %(FILE_NAME, process_date)
+            pickle.dump(songs, open(CHECKPOINT_FILE, "wb"))
 
-    # pickle the data
+
+        # sleep w jitter
+        print "Scraped one batch..sleeping and continuing"
+        batch += 1
+        time.sleep(SLEEP +  (uniform(-1, 1) * jitter_power))
+
+    # pickle the data for the last time
     pickle.dump(songs, open(FILE_NAME, "wb"))
     print "Done. Data has been saved as a dict in %s" %(FILE_NAME)
     return 0
