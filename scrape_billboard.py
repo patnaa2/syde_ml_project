@@ -44,11 +44,11 @@ def date_gen(start_date, end_date, n=7):
 
     if start_date.weekday() != 5:
         print "Specified start date %s is not a Saturday" %(start_date)
-        print "Updating start date to next Saturday"
         if start_date.weekday() == 6:
-            start_date = timedelta(6)
+            start_date += timedelta(6)
         else:
-            start_date = timedelta(5 - start_date.weekday())
+            start_date += timedelta(5 - start_date.weekday())
+        print "Updating start date to next Saturday %s" %(start_date)
 
     if start_date > end_date:
         raise StopIteration
@@ -62,9 +62,9 @@ def date_gen(start_date, end_date, n=7):
 def main():
     MAX_THREADS = 15
     SLEEP = 1
-    FILE_NAME = "top_hits_2000s.pik"
-    START_DATE = date(2000, 01, 01)
-    END_DATE = date(2011, 01, 01)
+    FILE_NAME = "top_hits_1990s.pik"
+    START_DATE = date(1990, 01, 01)
+    END_DATE = date(2000, 01, 01)
     CHECKPOINT_INTERVAL = 10
 
     songs = {}
@@ -80,7 +80,8 @@ def main():
         for _ in xrange(MAX_THREADS):
             try:
                 process_date = date_iter.next()
-            except:
+            except Exception as e:
+                print e
                 stop_iter = True
 
             t = ChartScraper(process_date)
