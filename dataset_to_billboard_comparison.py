@@ -30,17 +30,6 @@ def main():
             song_title = row[1].lower()
             csv_data[song_title].append(row)
 
-    #missed_hits = {}
-
-    #for song, artist in billboard_data.iterkeys():
-    #    if song.lower() not in csv_data:
-    #        missed_hits.append(song)
-
-    #print "Total number of songs found: %s/%s" %(len(billboard_data) - len(missed_hits), len(billboard_data))
-    #print "Missed songs written to file: missed_songs.pik"
-
-    #pickle.dump(missed_hits, open("missed_songs.pik", "wb"))
-
     match = 0
     for song, rows in csv_data.iteritems():
         if song in billboard_data:
