@@ -30,11 +30,12 @@ def main():
             csv_data[song_title].append(row)
 
     def check_for_missing_songs(b_data):
-        missed_hits = []
-        missing_artists = []
+        missed_hits = {}
+        missing_artists = {}
+
         for song, artist in b_data.iteritems():
             if song not in csv_data:
-                missed_hits.append(song)
+                missed_hits[song] = artist
             else:
                 found = False
                 for row in csv_data[song]:
@@ -43,7 +44,7 @@ def main():
                         break
 
                 if not found:
-                    missing_artists.append(song)
+                    missing_artists[song] = artist
 
         return missed_hits, missing_artists
 
