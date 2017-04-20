@@ -36,7 +36,7 @@ class ChartScraper(Thread):
 
         for song in songs:
             artist = [x for x in song.parent][3].text.strip()
-            self.songs[str(song.text)] = str(artist)
+            self.songs[str(song.text)] = [str(artist), self.date.year]
 
 def date_gen(start_date, end_date, n=7):
     assert type(start_date) == date
@@ -62,7 +62,7 @@ def date_gen(start_date, end_date, n=7):
 def main():
     MAX_THREADS = 15
     SLEEP = 1
-    FILE_NAME = "top_hits_1990s.pik"
+    FILE_NAME = "top_hits_1990s_w_year.pik"
     START_DATE = date(1990, 01, 01)
     END_DATE = date(2000, 01, 01)
     CHECKPOINT_INTERVAL = 10
