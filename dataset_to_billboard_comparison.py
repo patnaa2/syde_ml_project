@@ -41,7 +41,7 @@ def main():
                     row.append(0)
         else:
             for row in rows:
-                row.append(1)
+                row.append(0)
 
     rows_written = 0
     with open('updated_data.csv', 'wb') as csvfile:
