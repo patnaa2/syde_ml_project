@@ -112,5 +112,5 @@ for i in range(runs):
     print ("precision/recall:" + str(pr(results)))
     
     if method == 'dt':
-        export_graphviz(dt, out_file='dt' + str(i) + '.dot')
+        export_graphviz(clf, out_file='dt' + str(i) + '.dot')
 
