@@ -86,7 +86,7 @@ for i in range(runs):
     test_df = df.tail(test_num)
     
     # Train Model
-    if model == 'dt':
+    if method == 'dt':
         clf = DecisionTreeClassifier(min_samples_split=100, min_samples_leaf=100, max_depth=4, max_leaf_nodes=15)
     elif method == 'svm':
         # Set max_iter=100 to speed up processing and model convergence  
